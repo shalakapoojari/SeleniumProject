@@ -1,11 +1,11 @@
 package tests;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.opera.OperaDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+
 import org.testng.annotations.Test;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.testng.annotations.BeforeClass;
@@ -13,34 +13,39 @@ import org.testng.annotations.AfterClass;
 
 public class FirstProgram {
 
-	WebDriver driver;
+    WebDriver driver;
 
-	@Test
-	public void openMyBlog() throws Exception {
-		driver.get("https://www.softwaretestingmaterial.com/");
-		Thread.sleep(6000);
-	}
+    @Test
+    public void openMyBlog() throws Exception {
+        driver.get("https://www.softwaretestingmaterial.com/");
+        Thread.sleep(3000); // reduced wait
+    }
 
-	@BeforeClass
-	public void beforeClass() {
+    @BeforeClass
+    public void beforeClass() {
 
-		  WebDriverManager.chromedriver().setup();
-		  driver = new ChromeDriver();
-//		  WebDriverManager.firefoxdriver().setup();
-//		  driver = new FirefoxDriver();
+        // ✅ Automatically download correct ChromeDriver
+        WebDriverManager.chromedriver().setup();
 
-//		WebDriverManager.operadriver().setup();
-//		driver = new OperaDriver();
+        // ✅ Headless mode (REQUIRED for Jenkins)
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
 
-		driver.manage().window().maximize();
-		driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+        // ✅ Launch browser
+        driver = new ChromeDriver(options);
 
-	}
+        // ✅ Modern timeout (Selenium 4)
+        driver.manage().window().maximize();
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(60));
+    }
 
-	@AfterClass
-	public void afterClass() {
-		driver.manage().deleteAllCookies();
-		driver.quit();
-	}
-
+    @AfterClass
+    public void afterClass() {
+        if (driver != null) {
+            driver.manage().deleteAllCookies();
+            driver.quit();
+        }
+    }
 }
